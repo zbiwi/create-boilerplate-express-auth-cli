@@ -1,0 +1,10 @@
+node_modules
+.git
+.github
+.DS_Store
+npm-debug.log*
+.env
+README.md
+LICENSE
+*.tgz
+test/

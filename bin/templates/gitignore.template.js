@@ -1,0 +1,10 @@
+export const gitignoreTemplate = () => `
+node_modules/
+.env
+.DS_Store
+*.log
+dist/
+build/
+coverage/
+`;
+

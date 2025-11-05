@@ -1,0 +1,36 @@
+{
+  "name": "create-boilerplate-express-auth-cli",
+  "version": "1.0.0",
+  "description": "Express boilerplate generator with ready-to-use authentication (JWT, sessions, project structure, and CLI)",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "create-boilerplate-express-auth-cli": "bin/cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kévin C. choukroun.kevin@gmail.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zbiwi/create-boilerplate-express-auth-cli"
+  },
+   "keywords": [
+    "express",
+    "api",
+    "jwt",
+    "swagger",
+    "mongoose",
+    "sequelize",
+    "generator",
+    "cli",
+    "nodejs"
+  ],
+  "dependencies": {
+    "inquirer": "^12.10.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
