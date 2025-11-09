@@ -1,6 +1,6 @@
 {
   "name": "create-boilerplate-express-auth-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Express boilerplate generator with ready-to-use authentication (JWT, sessions, project structure, and CLI)",
   "main": "index.js",
   "type": "module",

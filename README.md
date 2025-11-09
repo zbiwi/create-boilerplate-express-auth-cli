@@ -69,7 +69,7 @@ my-api/
 ```
 
 ## 🧩 Example usage
-
+⚠️ For MySQL and Postgres, you must create the database manually.
 ```bash
 # 1️⃣ Create a new project
 npx create-boilerplate-express-auth-cli
