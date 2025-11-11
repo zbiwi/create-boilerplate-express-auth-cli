@@ -1,6 +1,6 @@
 {
   "name": "create-boilerplate-express-auth-cli",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Express boilerplate generator with ready-to-use authentication (JWT, sessions, project structure, and CLI)",
   "main": "index.js",
   "type": "module",
@@ -16,7 +16,7 @@
     "type": "git",
     "url": "https://github.com/zbiwi/create-boilerplate-express-auth-cli"
   },
-   "keywords": [
+  "keywords": [
     "express",
     "api",
     "jwt",
@@ -28,7 +28,10 @@
     "nodejs"
   ],
   "dependencies": {
-    "inquirer": "^12.10.0"
+    "express-session": "^1.18.2",
+    "inquirer": "^12.10.0",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0"
   },
   "engines": {
     "node": ">=22.0.0"

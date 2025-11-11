@@ -14,3 +14,6 @@ export { resetTemplate } from './reset.template.js';
 export { readmeTemplate } from './readme.template.js';
 export { packageTemplate } from './package.template.js';
 
+export { GoogleControllerTemplate } from './google/auth.controller.js';
+export { GoogleRoutesTemplate } from './google/auth.routes.js';
+export { PassportConfigTemplate } from './google/passport.config.js';

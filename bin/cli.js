@@ -18,7 +18,10 @@ import {
   seedTemplate,
   resetTemplate,
   readmeTemplate,
-  packageTemplate
+  packageTemplate,
+  GoogleControllerTemplate,
+  GoogleRoutesTemplate,
+  PassportConfigTemplate
 } from './templates/export.js';
 
 const run = (cmd, cwd = process.cwd()) => execSync(cmd, { stdio: "inherit", cwd });
@@ -35,6 +38,18 @@ const { orm, projectName } = await inquirer.prompt([
     name: "projectName",
     message: "Project name :",
     default: "my-api",
+  },
+]);
+
+// ================== Oauth2 configuration ==================
+console.log("\n🔒 Oauth2 configuration");
+
+const oauthConfig = await inquirer.prompt([
+  {
+    type: "confirm",
+    name: "oauth",
+    message: "Do you want to add oauthConfig ?",
+    default: true,
   },
 ]);
 
@@ -125,6 +140,7 @@ const projectPath = path.join(process.cwd(), projectName);
 if (!fs.existsSync(projectPath)) fs.mkdirSync(projectPath, { recursive: true });
 
 // Folders creation
+const folders = 
 [
   "src",
   "src/controllers",
@@ -134,20 +150,32 @@ if (!fs.existsSync(projectPath)) fs.mkdirSync(projectPath, { recursive: true });
   "src/middleware", 
   "seed", 
   "http"
-].forEach(dir => {
+]
+
+if(oauthConfig.oauth) {
+  folders.push("src/controllers/google");
+  folders.push("src/routes/google");
+}
+
+folders.forEach(dir => {
   fs.mkdirSync(path.join(projectPath, dir), { recursive: true });
 });
 
+if(oauthConfig.oauth) {
+  fs.writeFileSync(path.join(projectPath, "src/controllers/google/googleAuthController.js"), GoogleControllerTemplate());
+  fs.writeFileSync(path.join(projectPath, "src/routes/google/googleAuth.js"), GoogleRoutesTemplate());
+  fs.writeFileSync(path.join(projectPath, "src/config/passport.js"), PassportConfigTemplate());
+}
 // ================== Generate all files ==================
 console.log("📝 Generate files...");
 
-fs.writeFileSync(path.join(projectPath, "src/app.js"), appTemplate());
+fs.writeFileSync(path.join(projectPath, "src/app.js"), appTemplate(oauthConfig));
 fs.writeFileSync(path.join(projectPath, "src/server.js"), serverTemplate());
 fs.writeFileSync(path.join(projectPath, "src/swagger.js"), swaggerTemplate());
 fs.writeFileSync(path.join(projectPath, "src/middleware/auth.js"), middlewareTemplate());
 fs.writeFileSync(path.join(projectPath, "src/controllers/authController.js"), controllerTemplate(userFields));
 fs.writeFileSync(path.join(projectPath, "src/routes/auth.js"), routesTemplate(userFields));
-fs.writeFileSync(path.join(projectPath, "src/models/user.js"), modelTemplate(orm, userFields, modelConfig.timestamps));
+fs.writeFileSync(path.join(projectPath, "src/models/user.js"), modelTemplate(orm, userFields, modelConfig.timestamps, oauthConfig));
 fs.writeFileSync(path.join(projectPath, "src/config/db.js"), configTemplate(orm));
 fs.writeFileSync(path.join(projectPath, ".env.example"), envTemplate(orm));
 fs.writeFileSync(path.join(projectPath, ".gitignore"), gitignoreTemplate());
@@ -160,6 +188,9 @@ fs.writeFileSync(path.join(projectPath, "package.json"), JSON.stringify(packageT
 // ================== Install dependencies ==================
 console.log("📦 Install dependencies...");
 let deps = ["express","jsonwebtoken","bcrypt","dotenv","cors","helmet","swagger-ui-express","swagger-jsdoc"];
+if(oauthConfig.oauth) {
+  deps.push("passport", "passport-google-oauth20", "express-session");
+}
 if (orm === "mongoose") deps.push("mongoose");
 if (orm.includes("sequelize")) deps.push("sequelize","pg","pg-hstore","mysql2");
 
