@@ -1,6 +1,6 @@
 {
   "name": "create-boilerplate-express-auth-cli",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Express boilerplate generator with ready-to-use authentication (JWT, sessions, project structure, and CLI)",
   "main": "index.js",
   "type": "module",
@@ -25,7 +25,9 @@
     "sequelize",
     "generator",
     "cli",
-    "nodejs"
+    "nodejs",
+    "Oauth2",
+    "google auth"
   ],
   "dependencies": {
     "inquirer": "^12.10.0"

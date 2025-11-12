@@ -18,7 +18,9 @@ import {
   seedTemplate,
   resetTemplate,
   readmeTemplate,
-  packageTemplate
+  packageTemplate,
+  googleRoutesTemplate,
+  googleControllerTemplate
 } from './templates/export.js';
 
 const run = (cmd, cwd = process.cwd()) => execSync(cmd, { stdio: "inherit", cwd });
@@ -35,6 +37,18 @@ const { orm, projectName } = await inquirer.prompt([
     name: "projectName",
     message: "Project name :",
     default: "my-api",
+  },
+]);
+
+// ================== Oauth2 configuration ==================
+console.log("\n🔒 Oauth2 configuration");
+
+const oauthConfig = await inquirer.prompt([
+  {
+    type: "confirm",
+    name: "oauth",
+    message: "Do you want to add Google oauthConfig ?",
+    default: true,
   },
 ]);
 
@@ -125,7 +139,7 @@ const projectPath = path.join(process.cwd(), projectName);
 if (!fs.existsSync(projectPath)) fs.mkdirSync(projectPath, { recursive: true });
 
 // Folders creation
-[
+const folders = [
   "src",
   "src/controllers",
   "src/routes",
@@ -134,22 +148,34 @@ if (!fs.existsSync(projectPath)) fs.mkdirSync(projectPath, { recursive: true });
   "src/middleware", 
   "seed", 
   "http"
-].forEach(dir => {
+];
+
+if(oauthConfig.oauth) {
+  folders.push('src/routes/google', 'src/controllers/google');
+}
+
+folders.forEach(dir => {
   fs.mkdirSync(path.join(projectPath, dir), { recursive: true });
 });
+
+
+if(oauthConfig.oauth) {
+  fs.writeFileSync(path.join(projectPath, "src/routes/google/googleAuth.js"), googleRoutesTemplate());
+  fs.writeFileSync(path.join(projectPath, "src/controllers/google/googleAuthController.js"), googleControllerTemplate());
+}
 
 // ================== Generate all files ==================
 console.log("📝 Generate files...");
 
-fs.writeFileSync(path.join(projectPath, "src/app.js"), appTemplate());
+fs.writeFileSync(path.join(projectPath, "src/app.js"), appTemplate(oauthConfig));
 fs.writeFileSync(path.join(projectPath, "src/server.js"), serverTemplate());
 fs.writeFileSync(path.join(projectPath, "src/swagger.js"), swaggerTemplate());
 fs.writeFileSync(path.join(projectPath, "src/middleware/auth.js"), middlewareTemplate());
 fs.writeFileSync(path.join(projectPath, "src/controllers/authController.js"), controllerTemplate(userFields));
 fs.writeFileSync(path.join(projectPath, "src/routes/auth.js"), routesTemplate(userFields));
-fs.writeFileSync(path.join(projectPath, "src/models/user.js"), modelTemplate(orm, userFields, modelConfig.timestamps));
+fs.writeFileSync(path.join(projectPath, "src/models/user.js"), modelTemplate(orm, userFields, modelConfig.timestamps, oauthConfig));
 fs.writeFileSync(path.join(projectPath, "src/config/db.js"), configTemplate(orm));
-fs.writeFileSync(path.join(projectPath, ".env.example"), envTemplate(orm));
+fs.writeFileSync(path.join(projectPath, ".env.example"), envTemplate(orm, oauthConfig));
 fs.writeFileSync(path.join(projectPath, ".gitignore"), gitignoreTemplate());
 fs.writeFileSync(path.join(projectPath, "http/auth.http"), httpTemplate(userFields));
 fs.writeFileSync(path.join(projectPath, "seed/seed.js"), seedTemplate(orm, userFields));
@@ -160,6 +186,10 @@ fs.writeFileSync(path.join(projectPath, "package.json"), JSON.stringify(packageT
 // ================== Install dependencies ==================
 console.log("📦 Install dependencies...");
 let deps = ["express","jsonwebtoken","bcrypt","dotenv","cors","helmet","swagger-ui-express","swagger-jsdoc"];
+if(oauthConfig.oauth) {
+  deps.push('google-auth-library')
+}
+
 if (orm === "mongoose") deps.push("mongoose");
 if (orm.includes("sequelize")) deps.push("sequelize","pg","pg-hstore","mysql2");
 
@@ -178,6 +208,13 @@ userFields.forEach(field => {
   const badgeStr = badges.length ? ` [${badges.join(", ")}]` : "";
   console.log(`  - ${field.name} (${field.type})${badgeStr}`);
 });
+
+if(oauthConfig.oauth) {
+  console.log(`  - googleId [required, unique]`);
+  console.log(`  - googleName (string)`);
+  console.log(`  - googleFamilyName (string)`);
+}
+
 if (modelConfig.timestamps) {
   console.log(`  - createdAt (date) [auto]`);
   console.log(`  - updatedAt (date) [auto]`);

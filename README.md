@@ -1,3 +1,9 @@
+## 🚀 Quick start
+
+```bash
+npx create-boilerplate-express-auth-cli
+```
+
 # ⚡ create-boilerplate-express-auth-cli
 
 Because reconfiguring JWT, Express, Swagger, and an ORM for every project is time‑consuming.
@@ -11,26 +17,15 @@ A secure **Express MVC** API generator with **JWT**, **Swagger**, and an **ORM o
 [![npm version](https://img.shields.io/npm/v/create-boilerplate-express-auth-cli/svg)](https://www.npmjs.com/package/create-boilerplate-express-auth-cli)
 [![GitHub stars](https://img.shields.io/github/stars/zbiwi/create-boilerplate-express-auth-cli.svg)](https://github.com/zbiwi/create-boilerplate-express-auth-cli/stargazers)
 
----
 
 ## 🛠️ Technologies used
 
-Node.js / Express
-
-JWT (jsonwebtoken)
-
-bcryptjs
-
-Swagger UI Express
-
-Sequelize / Mongoose
-
----
-## 🚀 Quick start
-
-```bash
-npx create-boilerplate-express-auth-cli
-```
+Node.js / Express  
+JWT (jsonwebtoken)  
+bcryptjs  
+Swagger UI Express  
+Sequelize / Mongoose  
+Google auth library  
 
 ## 🧠 What this generator does
 
@@ -51,9 +46,11 @@ my-api/
 ├── src/
 │   ├── config/
 │   ├── controllers/
+│     └── google/
 │   ├── middleware/
 │   ├── models/
 │   ├── routes/
+│     └── google/
 │   ├── app.js
 │   ├── server.js
 │   └── swagger.js
@@ -121,4 +118,38 @@ Content-Type: application/json
   "email": "test@example.com",
   "password": "123456"
 }
+```
+
+## 🔐 Using Google Auth Library
+
+- **Enable the option**: when running the CLI, answer `Yes` to *Do you want to add Google oauthConfig ?*. This scaffolds the Google routes/controllers and installs `google-auth-library`.
+- **Configure Google Cloud**: create a project, enable *Google Identity Services*, set up an OAuth consent screen, and create a Web client ID. Add `http://localhost:3000/api/auth/google/login` to the list of authorized backend redirect URIs if needed.
+- **Update `.env`**: paste your `GOOGLE_CLIENT_ID` into `GOOGLE_CLIENT_ID=xxxxxxxx.apps.googleusercontent.com`, then restart the server (`npm run dev`).
+- Don't forget to add the frontend address in app.js for allow the cors
+- **Call the endpoint**: send the ID token returned by Google Sign-In to the backend via `POST /api/auth/google/login` with a JSON body `{ "token": "<GOOGLE_ID_TOKEN>" }`. If the user does not exist yet, it is created with `googleId`, `googleName`, and `googleFamilyName`.
+- **Response payload**: the backend returns a standard JWT (`token`) along with the user info. Reuse this JWT for protected endpoints just like the classic auth flow.
+
+Quick client-side example:
+
+```html
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <title>tuto_react</title>
+</head>
+```
+
+```js
+const googleSignIn = async (googleToken) => {
+  const res = await fetch("http://localhost:3000/api/auth/google/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ token: googleToken }),
+  });
+  if (!res.ok) throw new Error("Google login failed");
+  return res.json(); // { token, user }
+};
 ```
