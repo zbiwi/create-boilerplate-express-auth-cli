@@ -13,4 +13,5 @@ export { seedTemplate } from './seed.template.js';
 export { resetTemplate } from './reset.template.js';
 export { readmeTemplate } from './readme.template.js';
 export { packageTemplate } from './package.template.js';
-
+export { googleRoutesTemplate } from './google.routes.template.js';
+export { googleControllerTemplate } from './google.controller.template.js';
